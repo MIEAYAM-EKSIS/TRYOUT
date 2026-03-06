@@ -1,0 +1,953 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>TKA 2026 - Asesmen Akhir SD | Kota Samarinda</title>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #ffffff;
+            color: #000000;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Anti-Cheat Overlay */
+        .cheat-warning {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.95);
+            z-index: 99999;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            color: white;
+        }
+
+        .cheat-warning.show {
+            display: flex;
+        }
+
+        .cheat-warning i {
+            font-size: 60px;
+            color: #ff4444;
+            margin-bottom: 20px;
+        }
+
+        .cheat-warning h2 {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .cheat-warning p {
+            font-size: 16px;
+            color: #ffaaaa;
+            max-width: 500px;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        /* Timer Warning */
+        .timer-warning {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #ff4444;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 50px;
+            font-weight: 700;
+            z-index: 1000;
+            display: none;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        /* Main Layout */
+        .main-container {
+            display: flex;
+            height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 300px;
+            background: #f8f9fa;
+            border-right: 2px solid #000000;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            padding-bottom: 20px;
+            border-bottom: 2px solid #000000;
+            margin-bottom: 20px;
+        }
+
+        .header h1 {
+            font-size: 20px;
+            font-weight: 800;
+            margin-bottom: 5px;
+        }
+
+        .header p {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .timer-box {
+            background: #000000;
+            color: white;
+            padding: 15px;
+            border-radius: 12px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .timer-box .label {
+            font-size: 12px;
+            opacity: 0.8;
+            margin-bottom: 5px;
+        }
+
+        .timer-box .time {
+            font-size: 36px;
+            font-weight: 700;
+            font-family: monospace;
+            letter-spacing: 2px;
+        }
+
+        .progress-info {
+            background: white;
+            border: 2px solid #000000;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        .progress-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #000000;
+            width: 0%;
+            transition: width 0.3s;
+        }
+
+        .soal-nav {
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .soal-nav h4 {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 15px;
+        }
+
+        .nav-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 8px;
+        }
+
+        .nav-btn {
+            aspect-ratio: 1;
+            border: 2px solid #000000;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: white;
+        }
+
+        .nav-btn.answered {
+            background: #000000;
+            color: white;
+        }
+
+        .nav-btn.current {
+            border-color: #ff4444;
+            transform: scale(1.05);
+        }
+
+        .nav-btn:hover {
+            background: #f0f0f0;
+        }
+
+        /* Main Content */
+        .content {
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
+            background: white;
+        }
+
+        .soal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #000000;
+        }
+
+        .soal-nomor {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .soal-badge {
+            background: #000000;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .soal-card {
+            background: white;
+            border: 2px solid #000000;
+            border-radius: 24px;
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+
+        .soal-text {
+            font-size: 18px;
+            line-height: 1.6;
+            margin-bottom: 30px;
+            font-weight: 500;
+        }
+
+        .opsi-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .opsi-item {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .opsi-item:hover {
+            border-color: #000000;
+            background: #f8f9fa;
+        }
+
+        .opsi-item.selected {
+            border-color: #000000;
+            background: #f0f0f0;
+        }
+
+        .opsi-item input[type="radio"] {
+            width: 20px;
+            height: 20px;
+            margin-right: 15px;
+            accent-color: #000000;
+        }
+
+        .opsi-huruf {
+            font-weight: 700;
+            margin-right: 15px;
+            width: 30px;
+            font-size: 18px;
+        }
+
+        .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border: 2px solid #000000;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: white;
+            font-size: 16px;
+        }
+
+        .btn-primary {
+            background: #000000;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #333333;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Modal */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border: 3px solid #000000;
+            border-radius: 24px;
+            padding: 30px;
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+        }
+
+        .modal-content h2 {
+            font-size: 24px;
+            margin-bottom: 15px;
+        }
+
+        .modal-content p {
+            margin-bottom: 25px;
+            color: #666;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .modal-btn {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #000000;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .modal-btn.primary {
+            background: #000000;
+            color: white;
+        }
+
+        .modal-btn.danger {
+            background: #ff4444;
+            color: white;
+            border-color: #ff4444;
+        }
+
+        /* Result Modal */
+        .result-content {
+            max-width: 500px;
+        }
+
+        .score-circle {
+            width: 150px;
+            height: 150px;
+            border: 5px solid #000000;
+            border-radius: 50%;
+            margin: 20px auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            font-weight: 800;
+        }
+
+        .result-detail {
+            margin: 20px 0;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 12px;
+        }
+
+        .result-detail p {
+            margin: 10px 0;
+            font-size: 16px;
+        }
+
+        /* Anti-Cheat Log */
+        .anti-cheat-log {
+            position: fixed;
+            bottom: 10px;
+            left: 10px;
+            font-size: 10px;
+            color: #ccc;
+            z-index: 9999;
+        }
+    </style>
+</head>
+<body>
+    <!-- Anti-Cheat Warning -->
+    <div class="cheat-warning" id="cheatWarning">
+        <i class="fas fa-exclamation-triangle"></i>
+        <h2>PERINGATAN!</h2>
+        <p>Anda terdeteksi membuka aplikasi atau tab lain. Ujian akan direset dan dimulai dari awal.</p>
+        <div class="timer-box" style="background: #ff4444; width: 200px;">
+            <div class="time" id="resetTimer">5</div>
+        </div>
+    </div>
+
+    <!-- Timer Warning -->
+    <div class="timer-warning" id="timerWarning">
+        <i class="fas fa-clock"></i> <span id="warningTime">10:00</span>
+    </div>
+
+    <!-- Main Container -->
+    <div class="main-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="header">
+                <h1>📋 TKA 2026</h1>
+                <p>Asesmen Akhir SD - Samarinda</p>
+                <p style="font-size: 12px; margin-top: 5px;">Matematika | 35 Soal</p>
+            </div>
+
+            <div class="timer-box">
+                <div class="label">SISA WAKTU</div>
+                <div class="time" id="timer">01:00:00</div>
+            </div>
+
+            <div class="progress-info">
+                <div class="progress-item">
+                    <span>Soal Terjawab</span>
+                    <span id="jawabanCount">0/35</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressBar" style="width: 0%"></div>
+                </div>
+                <div class="progress-item">
+                    <span>Sisa Soal</span>
+                    <span id="sisaSoal">35</span>
+                </div>
+            </div>
+
+            <div class="soal-nav">
+                <h4>Navigasi Soal</h4>
+                <div class="nav-grid" id="soalNav"></div>
+            </div>
+        </div>
+
+        <!-- Content -->
+        <div class="content">
+            <div class="soal-header">
+                <div class="soal-nomor" id="soalNomorDisplay">Soal No. 1</div>
+                <div class="soal-badge" id="soalLevel">Level: L2</div>
+            </div>
+
+            <div class="soal-card">
+                <div class="soal-text" id="soalText">
+                    Loading soal...
+                </div>
+
+                <div class="opsi-container" id="opsiContainer">
+                    <!-- Options will be generated here -->
+                </div>
+            </div>
+
+            <div class="nav-buttons">
+                <button class="btn" onclick="prevSoal()" id="prevBtn">
+                    <i class="fas fa-arrow-left"></i> Sebelumnya
+                </button>
+                <button class="btn btn-primary" onclick="nextSoal()" id="nextBtn">
+                    Selanjutnya <i class="fas fa-arrow-right"></i>
+                </button>
+            </div>
+
+            <div style="text-align: center; margin-top: 20px;">
+                <button class="btn" style="border-color: #ff4444;" onclick="confirmSubmit()">
+                    <i class="fas fa-check-circle"></i> Selesai & Kumpulkan
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Peringatan Soal Belum Dijawab -->
+    <div class="modal" id="warningModal">
+        <div class="modal-content">
+            <i class="fas fa-exclamation-circle" style="font-size: 48px; color: #ff4444; margin-bottom: 15px;"></i>
+            <h2>Peringatan!</h2>
+            <p id="warningMessage">Soal nomor 5 belum dijawab. Lanjutkan?</p>
+            <div class="modal-buttons">
+                <button class="modal-btn" onclick="hideWarning()">Kembali</button>
+                <button class="modal-btn primary" id="warningConfirmBtn" onclick="confirmLanjut()">Lanjutkan</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Konfirmasi Submit -->
+    <div class="modal" id="submitModal">
+        <div class="modal-content">
+            <i class="fas fa-question-circle" style="font-size: 48px; color: #000000; margin-bottom: 15px;"></i>
+            <h2>Kumpulkan Jawaban?</h2>
+            <p id="submitMessage">Anda telah menjawab <span id="submitJawabanCount">0</span> dari 35 soal.<br>Soal belum dijawab: <span id="submitBelumJawab">0</span></p>
+            <div class="modal-buttons">
+                <button class="modal-btn" onclick="hideSubmitModal()">Periksa Lagi</button>
+                <button class="modal-btn primary" onclick="calculateScore()">Ya, Kumpulkan</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Hasil -->
+    <div class="modal" id="resultModal">
+        <div class="modal-content result-content">
+            <i class="fas fa-trophy" style="font-size: 48px; color: #ffd700; margin-bottom: 15px;"></i>
+            <h2>Hasil Ujian</h2>
+            <div class="score-circle" id="scoreDisplay">0</div>
+            
+            <div class="result-detail">
+                <p><strong>Jawaban Benar:</strong> <span id="resultBenar">0</span>/35</p>
+                <p><strong>Jawaban Salah:</strong> <span id="resultSalah">0</span></p>
+                <p><strong>Tidak Dijawab:</strong> <span id="resultKosong">0</span></p>
+                <p><strong>Waktu Selesai:</strong> <span id="resultWaktu"></span></p>
+                <p><strong>Nilai Akhir:</strong> <span id="resultNilai">0</span></p>
+            </div>
+            
+            <div style="font-size: 24px; font-weight: 800; margin: 15px 0;" id="resultGrade"></div>
+            
+            <button class="btn btn-primary" style="width: 100%;" onclick="restartExam()">
+                <i class="fas fa-redo"></i> Ujian Baru
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Soal Data (35 soal sesuai kisi-kisi)
+        const soalData = [
+            // Bilangan (1-10)
+            { no: 1, level: "L2", materi: "Komposisi uang", soal: "Bu Ani memiliki uang pecahan Rp100.000 sebanyak 3 lembar, Rp50.000 sebanyak 2 lembar, Rp20.000 sebanyak 4 lembar, dan Rp10.000 sebanyak 5 lembar. Berapa total uang Bu Ani?", opsi: ["Rp450.000", "Rp500.000", "Rp550.000", "Rp600.000"], jawaban: 1 },
+            { no: 2, level: "L1", materi: "Penjumlahan & Pengurangan", soal: "Hasil dari 45.678 + 23.456 - 12.345 adalah...", opsi: ["56.789", "57.789", "66.789", "67.789"], jawaban: 0 },
+            { no: 3, level: "L3", materi: "Perkalian & Pembagian", soal: "Sebuah toko memiliki 24 kotak pensil. Setiap kotak berisi 12 pensil. Semua pensil akan dibagikan kepada 8 anak secara merata. Berapa pensil yang diterima setiap anak?", opsi: ["36", "32", "28", "24"], jawaban: 0 },
+            { no: 4, level: "L1", materi: "KPK", soal: "KPK dari 12, 18, dan 24 adalah...", opsi: ["36", "48", "72", "96"], jawaban: 2 },
+            { no: 5, level: "L2", materi: "FPB/KPK cerita", soal: "Rina berenang setiap 4 hari sekali, Siti setiap 6 hari sekali, dan Dewi setiap 8 hari sekali. Mereka berenang bersama pada tanggal 1 Maret 2026. Pada tanggal berapa mereka akan berenang bersama lagi?", opsi: ["25 Maret", "26 Maret", "27 Maret", "28 Maret"], jawaban: 0 },
+            { no: 6, level: "L1", materi: "Urutkan pecahan", soal: "Urutkan pecahan berikut dari yang terkecil: 3/4, 0,6, 75%, 2/3", opsi: ["0,6; 2/3; 3/4; 75%", "2/3; 0,6; 75%; 3/4", "0,6; 2/3; 75%; 3/4", "2/3; 0,6; 3/4; 75%"], jawaban: 0 },
+            { no: 7, level: "L1", materi: "Penjumlahan pecahan", soal: "Hasil dari 5/6 + 2/3 - 1/2 adalah...", opsi: ["1", "1 1/6", "1 1/3", "1 1/2"], jawaban: 0 },
+            { no: 8, level: "L3", materi: "Perkalian pecahan", soal: "Ibu memiliki 3/4 kg tepung. Ibu menggunakan 1/3 dari tepung tersebut untuk membuat kue. Berapa kg tepung yang digunakan?", opsi: ["1/4 kg", "1/3 kg", "1/2 kg", "2/3 kg"], jawaban: 0 },
+            { no: 9, level: "L1", materi: "Ubah pecahan", soal: "Bentuk persen dari 0,75 adalah...", opsi: ["7,5%", "75%", "750%", "0,75%"], jawaban: 1 },
+            { no: 10, level: "L2", materi: "Membandingkan desimal", soal: "Andi membeli 2,5 kg apel, Budi membeli 2,25 kg apel, dan Cici membeli 2,75 kg apel. Siapakah yang membeli apel paling banyak?", opsi: ["Andi", "Budi", "Cici", "Andi dan Cici"], jawaban: 2 },
+            
+            // Aljabar (11-17)
+            { no: 11, level: "L2", materi: "Aljabar penjumlahan", soal: "Dalam sebuah keranjang terdapat x buah mangga. Setelah ditambah 25 mangga, jumlahnya menjadi 75 mangga. Berapa nilai x?", opsi: ["40", "45", "50", "55"], jawaban: 2 },
+            { no: 12, level: "L1", materi: "Aljabar perkalian", soal: "Jika 15 × n = 300, maka nilai n adalah...", opsi: ["15", "20", "25", "30"], jawaban: 1 },
+            { no: 13, level: "L2", materi: "Pola membesar", soal: "Seorang peternak memiliki 5 ekor ayam. Setiap bulan jumlah ayamnya bertambah 3 kali lipat. Berapa jumlah ayam setelah 3 bulan?", opsi: ["15", "45", "135", "405"], jawaban: 2 },
+            { no: 14, level: "L1", materi: "Pola mengecil", soal: "Pola bilangan: 1.024, 512, 256, 128, ... Bilangan selanjutnya adalah...", opsi: ["64", "32", "16", "8"], jawaban: 0 },
+            { no: 15, level: "L3", materi: "Rasio satuan", soal: "Untuk membuat 5 gelas sirup diperlukan 2 sendok gula. Berapa sendok gula yang diperlukan untuk membuat 15 gelas sirup?", opsi: ["4", "6", "8", "10"], jawaban: 1 },
+            { no: 16, level: "L3", materi: "Proporsi perkalian", soal: "Sebuah mobil menghabiskan 8 liter bensin untuk menempuh jarak 96 km. Jika jarak yang ditempuh 144 km, berapa liter bensin yang diperlukan?", opsi: ["10", "12", "14", "16"], jawaban: 1 },
+            { no: 17, level: "L2", materi: "Proporsi pembagian", soal: "24 ekor sapi mampu menghabiskan rumput di sebuah ladang dalam 6 hari. Jika sapi berkurang menjadi 18 ekor, berapa hari rumput akan habis?", opsi: ["8", "9", "10", "12"], jawaban: 0 },
+            
+            // Pengukuran (18-24)
+            { no: 18, level: "L1", materi: "Keliling", soal: "Hitunglah keliling persegi panjang dengan panjang 12 cm dan lebar 8 cm!", opsi: ["20 cm", "40 cm", "96 cm", "48 cm"], jawaban: 1 },
+            { no: 19, level: "L3", materi: "Keliling", soal: "Sebuah taman berbentuk persegi panjang dengan panjang 25 m dan lebar 15 m. Di sekeliling taman akan dipasang lampu dengan jarak 5 m. Berapa banyak lampu yang diperlukan?", opsi: ["14", "15", "16", "17"], jawaban: 2 },
+            { no: 20, level: "L1", materi: "Luas", soal: "Luas segitiga dengan alas 15 cm dan tinggi 10 cm adalah...", opsi: ["75 cm²", "150 cm²", "300 cm²", "600 cm²"], jawaban: 0 },
+            { no: 21, level: "L1", materi: "Luas gabungan", soal: "Hitunglah luas bangun gabungan: persegi panjang 12 cm × 5 cm digabung dengan persegi panjang 8 cm × 5 cm (sisi lebar sama)", opsi: ["80 cm²", "90 cm²", "100 cm²", "110 cm²"], jawaban: 2 },
+            { no: 22, level: "L2", materi: "Durasi waktu", soal: "Rina belajar dari pukul 19.30 sampai 21.15. Berapa menit Rina belajar?", opsi: ["90", "95", "100", "105"], jawaban: 3 },
+            { no: 23, level: "L3", materi: "Durasi waktu", soal: "Sebuah kereta berangkat pukul 08.40 dan sampai pukul 11.25. Berapa lama perjalanan?", opsi: ["2 jam 35 menit", "2 jam 45 menit", "3 jam 15 menit", "3 jam 25 menit"], jawaban: 1 },
+            { no: 24, level: "L1", materi: "Sudut", soal: "Manakah yang merupakan sudut tumpul? (1) 45°, (2) 120°, (3) 90°, (4) 30°", opsi: ["(1)", "(2)", "(3)", "(4)"], jawaban: 1 },
+            
+            // Geometri (25-30)
+            { no: 25, level: "L1", materi: "Jaring-jaring", soal: "Gambar jaring-jaring yang terdiri dari 6 persegi yang sama besar adalah jaring-jaring bangun...", opsi: ["Kubus", "Balok", "Limas", "Prisma"], jawaban: 0 },
+            { no: 26, level: "L1", materi: "Sifat bangun datar", soal: "Bangun datar yang memiliki 4 sisi sama panjang, 4 sudut siku-siku adalah...", opsi: ["Persegi panjang", "Persegi", "Belah ketupat", "Jajargenjang"], jawaban: 1 },
+            { no: 27, level: "L1", materi: "Sifat bangun ruang", soal: "Bangun ruang yang memiliki 6 sisi, 12 rusuk, dan 8 titik sudut adalah...", opsi: ["Kubus", "Balok", "Prisma", "Limas"], jawaban: 1 },
+            { no: 28, level: "L1", materi: "Lokasi peta", soal: "Rumah Andi di koordinat (C,3). Jika rumah Budi 2 petak ke kanan dan 1 ke atas dari Andi, koordinat Budi?", opsi: ["(E,4)", "(A,2)", "(C,5)", "(E,2)"], jawaban: 0 },
+            { no: 29, level: "L2", materi: "Koordinat", soal: "Titik A(2,1), B(5,1), C(5,4). Agar persegi panjang, titik D harus di...", opsi: ["(2,4)", "(4,2)", "(1,5)", "(4,4)"], jawaban: 0 },
+            { no: 30, level: "L2", materi: "Visualisasi spasial", soal: "Bangun dari 4 kubus. Tampak depan 3 kubus, samping 2 kubus. Gambar yang sesuai?", opsi: ["Gambar A", "Gambar B", "Gambar C", "Gambar D"], jawaban: 0 },
+            
+            // Data (31-35)
+            { no: 31, level: "L1", materi: "Piktogram", soal: "Piktogram: Apel 🍎🍎🍎 (3 gambar). Jika 1 gambar = 5 siswa, berapa siswa suka apel?", opsi: ["10", "15", "20", "25"], jawaban: 1 },
+            { no: 32, level: "L1", materi: "Tabel frekuensi", soal: "Data: 7,8,6,7,9,8,7,6,8,7,9,7,8,6,9,8,7,8,7,6. Frekuensi nilai 7?", opsi: ["6", "7", "8", "9"], jawaban: 1 },
+            { no: 33, level: "L1", materi: "Diagram batang", soal: "Penjualan: Senin 40, Selasa 35, Rabu 50, Kamis 45, Jumat 60. Rata-rata?", opsi: ["44", "45", "46", "47"], jawaban: 2 },
+            { no: 34, level: "L2", materi: "Peluang", soal: "Kantong: 4 merah, 5 biru, 3 hijau. Kejadian paling mungkin?", opsi: ["Merah", "Biru", "Hijau", "Merah & Biru"], jawaban: 1 },
+            { no: 35, level: "L3", materi: "Peluang", soal: "Dua dadu dilempar. Peluang jumlah 7?", opsi: ["1/6", "1/8", "1/9", "1/12"], jawaban: 0 }
+        ];
+
+        // State
+        let jawaban = new Array(35).fill(null);
+        let currentSoal = 0;
+        let waktu = 60 * 60; // 1 jam dalam detik
+        let timerInterval;
+        let examStarted = true;
+        let cheatDetected = false;
+        let resetTimer = 5;
+        let resetInterval;
+        let targetSoalAfterWarning = null;
+
+        // Initialize
+        window.onload = function() {
+            generateSoalNav();
+            loadSoal(0);
+            startTimer();
+            
+            // Anti-Cheat: Detect tab/window change
+            document.addEventListener('visibilitychange', function() {
+                if (document.hidden && examStarted && !cheatDetected) {
+                    triggerCheatDetection();
+                }
+            });
+
+            // Anti-Cheat: Detect copy/paste
+            document.addEventListener('copy', function(e) {
+                if (examStarted) {
+                    e.preventDefault();
+                    triggerCheatDetection();
+                }
+            });
+
+            document.addEventListener('paste', function(e) {
+                if (examStarted) {
+                    e.preventDefault();
+                    triggerCheatDetection();
+                }
+            });
+
+            // Anti-Cheat: Detect right click
+            document.addEventListener('contextmenu', function(e) {
+                if (examStarted) {
+                    e.preventDefault();
+                }
+            });
+
+            // Anti-Cheat: Detect keyboard shortcuts
+            document.addEventListener('keydown', function(e) {
+                if (examStarted) {
+                    // Prevent Ctrl+C, Ctrl+V, Ctrl+X, Ctrl+P, F12
+                    if (e.ctrlKey && (e.key === 'c' || e.key === 'v' || e.key === 'x' || e.key === 'p') || e.key === 'F12') {
+                        e.preventDefault();
+                        triggerCheatDetection();
+                    }
+                }
+            });
+
+            // Anti-Cheat: Detect window blur (alt+tab, etc)
+            window.addEventListener('blur', function() {
+                if (examStarted && !cheatDetected) {
+                    triggerCheatDetection();
+                }
+            });
+        };
+
+        function startTimer() {
+            timerInterval = setInterval(() => {
+                if (waktu <= 0) {
+                    clearInterval(timerInterval);
+                    // Waktu habis, auto submit
+                    calculateScore(true);
+                } else {
+                    waktu--;
+                    updateTimerDisplay();
+                    
+                    // Warning ketika sisa 10 menit
+                    if (waktu === 600) { // 10 menit
+                        document.getElementById('timerWarning').style.display = 'block';
+                        document.getElementById('warningTime').innerText = formatTime(waktu);
+                    }
+                    // Warning ketika sisa 5 menit
+                    else if (waktu === 300) { // 5 menit
+                        document.getElementById('timerWarning').style.backgroundColor = '#ff0000';
+                    }
+                    // Warning ketika sisa 1 menit
+                    else if (waktu === 60) { // 1 menit
+                        document.getElementById('timerWarning').style.backgroundColor = '#ff0000';
+                        document.getElementById('timerWarning').style.animation = 'pulse 0.5s infinite';
+                    }
+                }
+            }, 1000);
+        }
+
+        function updateTimerDisplay() {
+            const hours = Math.floor(waktu / 3600);
+            const minutes = Math.floor((waktu % 3600) / 60);
+            const seconds = waktu % 60;
+            
+            document.getElementById('timer').innerText = 
+                `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            
+            document.getElementById('warningTime').innerText = 
+                `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        function formatTime(totalSeconds) {
+            const minutes = Math.floor(totalSeconds / 60);
+            const seconds = totalSeconds % 60;
+            return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        function generateSoalNav() {
+            const nav = document.getElementById('soalNav');
+            nav.innerHTML = '';
+            
+            for (let i = 0; i < 35; i++) {
+                const btn = document.createElement('div');
+                btn.className = `nav-btn ${jawaban[i] !== null ? 'answered' : ''}`;
+                btn.innerText = i + 1;
+                btn.onclick = () => goToSoal(i);
+                nav.appendChild(btn);
+            }
+        }
+
+        function updateNav() {
+            const btns = document.querySelectorAll('.nav-btn');
+            btns.forEach((btn, index) => {
+                btn.className = `nav-btn ${jawaban[index] !== null ? 'answered' : ''} ${index === currentSoal ? 'current' : ''}`;
+            });
+            
+            // Update progress
+            const answered = jawaban.filter(j => j !== null).length;
+            document.getElementById('jawabanCount').innerText = `${answered}/35`;
+            document.getElementById('sisaSoal').innerText = 35 - answered;
+            document.getElementById('progressBar').style.width = `${(answered / 35) * 100}%`;
+        }
+
+        function loadSoal(index) {
+            const soal = soalData[index];
+            document.getElementById('soalNomorDisplay').innerText = `Soal No. ${soal.no}`;
+            document.getElementById('soalLevel').innerText = `Level: ${soal.level} | ${soal.materi}`;
+            document.getElementById('soalText').innerText = soal.soal;
+            
+            // Generate options
+            const opsiContainer = document.getElementById('opsiContainer');
+            opsiContainer.innerHTML = '';
+            
+            const huruf = ['A', 'B', 'C', 'D'];
+            soal.opsi.forEach((opsi, i) => {
+                const opsiDiv = document.createElement('div');
+                opsiDiv.className = `opsi-item ${jawaban[index] === i ? 'selected' : ''}`;
+                
+                const radio = document.createElement('input');
+                radio.type = 'radio';
+                radio.name = 'jawaban';
+                radio.value = i;
+                radio.checked = jawaban[index] === i;
+                radio.onchange = () => selectJawaban(index, i);
+                
+                const hurufSpan = document.createElement('span');
+                hurufSpan.className = 'opsi-huruf';
+                hurufSpan.innerText = huruf[i];
+                
+                const textSpan = document.createElement('span');
+                textSpan.innerText = opsi;
+                
+                opsiDiv.appendChild(radio);
+                opsiDiv.appendChild(hurufSpan);
+                opsiDiv.appendChild(textSpan);
+                
+                opsiDiv.onclick = () => {
+                    radio.checked = true;
+                    selectJawaban(index, i);
+                };
+                
+                opsiContainer.appendChild(opsiDiv);
+            });
+            
+            // Update navigation buttons
+            document.getElementById('prevBtn').disabled = index === 0;
+            document.getElementById('nextBtn').innerHTML = index === 34 ? 
+                'Selesai <i class="fas fa-check"></i>' : 
+                'Selanjutnya <i class="fas fa-arrow-right"></i>';
+            
+            updateNav();
+        }
+
+        function selectJawaban(no, jawab) {
+            jawaban[no] = jawab;
+            updateNav();
+        }
+
+        function goToSoal(index) {
+            // Check if current soal is answered before leaving
+            if (jawaban[currentSoal] === null && currentSoal !== index) {
+                targetSoalAfterWarning = index;
+                showWarning();
+            } else {
+                currentSoal = index;
+                loadSoal(currentSoal);
+            }
+        }
+
+        function nextSoal() {
+            if (currentSoal < 34) {
+                if (jawaban[currentSoal] === null) {
+                    targetSoalAfterWarning = currentSoal + 1;
+                    showWarning();
+                } else {
+                    currentSoal++;
+                    loadSoal(currentSoal);
+                }
+            } else {
+                confirmSubmit();
+            }
+        }
+
+        function prevSoal() {
+            if (currentSoal > 0) {
+                if (jawaban[currentSoal] === null && currentSoal - 1 !== currentSoal) {
+                    targetSoalAfterWarning = currentSoal - 1;
+                    showWarning();
+                } else {
+                    currentSoal--;
+                    loadSoal(currentSoal);
+                }
+            }
+        }
+
+        function showWarning() {
+            const modal = document.getElementById('warningModal');
+            const message = document.getElementById('warningMessage');
+            
+            message.innerText = `Soal nomor ${currentSoal + 1} belum dijawab. Pindah soal?`;
+            
+            modal.classList.add('show');
+        }
+
+        function confirmLanjut() {
+            hideWarning();
+            if (targetSoalAfterWarning !== null) {
+                currentSoal = targetSoalAfterWarning;
+                loadSoal(currentSoal);
+                targetSoalAfterWarning = null;
+            }
+        }
+
+        function hideWarning() {
+            document.getElementById('warningModal').classList.remove('show');
+        }
+
+        function confirmSubmit() {
+            const answered = jawaban.filter(j => j !== null).length;
+            document.getElementById('submitJawabanCount').innerText = answered;
+            document.getElementById('submitBelumJawab').innerText = 35 - answered;
+            document.getElementById('submitModal').classList.add('show');
+        }
+
+        function hideSubmitModal() {
+            document.getElementById('submitModal').classList.remove('show');
+        }
+
+        function calculateScore(autoSubmit = false) {
+            // Stop timer
+            clearInterval(timerInterval);
+            
+            // Hitung jawaban benar
+            let benar = 0;
+            jawaban.forEach((j, index) => {
+                if (j !== null && j === soalData[index].jawaban) {
+                    benar++;
+                }
+            });
+            
+            const nilai = Math.round((benar * 100) / 35);
+            
+            // Tampilkan hasil
+            document.getElementById('scoreDisplay').innerText = nilai;
+            document.getElementById('resultBenar').innerText = benar;
+            document.getElementById('resultSalah').innerText = 35 - benar - (jawaban.filter(j => j === null).length);
+            document.getElementById('resultKosong').innerText = jawaban.filter(j => j === null).length;
+            document.getElementById('resultWaktu').innerText = new Date().toLocaleString('id-ID');
+            document.getElementById('resultNilai').innerText = nilai;
+            
+            // Grade
+            const grade = document.getElementById('resultGrade');
+            if (nilai >= 90) grade.innerText = '🏆 A (Sangat Baik)';
+            else if (nilai >= 75) grade.innerText = '📚 B (Baik)';
+            else if (nilai >= 60) grade.innerText = '📖 C (Cukup)';
+            else grade.innerText = '📝 D (Perlu Bimbingan)';
+            
+            // Hide submit modal if open
+            hideSubmitModal();
+            
+            // Show result modal
+            document.getElementById('resultModal').classList.add('show');
+            
+            if (autoSubmit) {
+                alert('Waktu pengerjaan telah habis! Jawaban akan otomatis dikumpulkan.');
+            }
+        }
+
+        function triggerCheatDetection() {
+            if (cheatDetected) return;
+            
+            cheatDetected = true;
+            clearInterval(timerInterval);
+            
+            const warning = document.getElementById('cheatWarning');
+            warning.classList.add('show');
+            
+            resetTimer = 5;
+            document.getElementById('resetTimer').innerText = resetTimer;
+            
+            resetInterval = setInterval(() => {
+                resetTimer--;
+                document.getElementById('resetTimer').innerText = resetTimer;
+                
+                if (resetTimer <= 0) {
+                    clearInterval(resetInterval);
+                    // Reset exam
+                    restartExam();
+                }
+            }, 1000);
+        }
+
+        function restartExam() {
+            location.reload();
+        }
+    </script>
+</body>
+</html>
